@@ -6,7 +6,7 @@ terraform.tfstate.backup
 .terraform/
 
 # Ignore lock files (optional)
-terraform.lock.hcl
+Terraform/.terraform.lock.hcl
 
 # Ignore sensitive variable files
 *.tfvars
