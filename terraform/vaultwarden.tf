@@ -1,6 +1,6 @@
 # Define OpenStack project config etc.
 locals {
-  cacert_file = "./os-trusted-cas"
+  cacert_file = "../os-trusted-cas"
   router_name = "CloudServ7-router"
   dns_servers = ["10.33.16.100", "8.8.8.8"]
   pubnet_name = "ext_net"
