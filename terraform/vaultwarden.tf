@@ -147,6 +147,36 @@ locals {
   backend-instance_names  = [for instance in openstack_compute_instance_v2.vaultwarden-backend-instances : instance.name]
 }
 
+
+###########################################################################
+#
+# create database instances
+#
+###########################################################################
+resource "openstack_compute_instance_v2" "vaultwarden-database-instances" {
+  count           = 2
+  name            = "vaultwarden-database-instance-${count.index + 1}"
+  image_name      = local.image_name
+  flavor_name     = local.flavor_name
+  key_pair        = openstack_compute_keypair_v2.terraform-keypair.name
+  security_groups = [openstack_networking_secgroup_v2.terraform-secgroup.name]
+
+  depends_on = [openstack_networking_subnet_v2.terraform-subnet-1]
+
+  network {
+    uuid = openstack_networking_network_v2.terraform-network-1.id
+  }
+  user_data = templatefile("${path.module}/scripts/dummyLoadBalancer.tpl", {
+    instance_number = count.index + 1
+    public_key      = tls_private_key.deployment_key.public_key_openssh
+  })
+}
+
+locals {
+  database_private_ip_list = [for instance in openstack_compute_instance_v2.vaultwarden-backend-instances : instance.network[0].fixed_ip_v4]
+  database-instance_names  = [for instance in openstack_compute_instance_v2.vaultwarden-backend-instances : instance.name]
+}
+
 ###########################################################################
 #
 # create deployment instances
@@ -170,6 +200,7 @@ resource "openstack_compute_instance_v2" "vaultwarden-deployment-instance" {
     private_key              = tls_private_key.deployment_key.private_key_openssh
     backend_private_ip_list  = local.backend_private_ip_list
     frontend_private_ip_list = local.frontend_private_ip_list
+    database_private_ip_list = local.database_private_ip_list
   })
 }
 
