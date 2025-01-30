@@ -34,13 +34,6 @@ ${ip} ansible_user=ubuntu
 ${ip} ansible_user=ubuntu
 %{ endfor }
 
-[databases]
-%{ for ip in database_private_ip_list }
-${ip} ansible_user=ubuntu
-%{ endfor }
-
 [all:vars]
 ansible_ssh_private_key_file=~/.ssh/deployment_key
 EOF
-
-
