@@ -87,6 +87,25 @@ resource "openstack_networking_secgroup_rule_v2" "terraform-secgroup-rule-ssh" {
   security_group_id = openstack_networking_secgroup_v2.terraform-secgroup.id
 }
 
+resource "openstack_networking_secgroup_rule_v2" "terraform-secgroup-rule-prometheus" {
+  direction      = "ingress"
+  ethertype      = "IPv4"
+  protocol       = "tcp"
+  port_range_min = 9090
+  port_range_max = 9090
+  #remote_ip_prefix  = "0.0.0.0/0"
+  security_group_id = openstack_networking_secgroup_v2.terraform-secgroup.id
+}
+
+resource "openstack_networking_secgroup_rule_v2" "terraform-secgroup-rule-grafana" {
+  direction      = "ingress"
+  ethertype      = "IPv4"
+  protocol       = "tcp"
+  port_range_min = 3000
+  port_range_max = 3000
+  #remote_ip_prefix  = "0.0.0.0/0"
+  security_group_id = openstack_networking_secgroup_v2.terraform-secgroup.id
+}
 
 ###########################################################################
 #
@@ -150,35 +169,6 @@ locals {
 
 ###########################################################################
 #
-# create database instances
-#
-###########################################################################
-resource "openstack_compute_instance_v2" "vaultwarden-database-instances" {
-  count           = 2
-  name            = "vaultwarden-database-instance-${count.index + 1}"
-  image_name      = local.image_name
-  flavor_name     = local.flavor_name
-  key_pair        = openstack_compute_keypair_v2.terraform-keypair.name
-  security_groups = [openstack_networking_secgroup_v2.terraform-secgroup.name]
-
-  depends_on = [openstack_networking_subnet_v2.terraform-subnet-1]
-
-  network {
-    uuid = openstack_networking_network_v2.terraform-network-1.id
-  }
-  user_data = templatefile("${path.module}/scripts/dummyLoadBalancer.tpl", {
-    instance_number = count.index + 1
-    public_key      = tls_private_key.deployment_key.public_key_openssh
-  })
-}
-
-locals {
-  database_private_ip_list = [for instance in openstack_compute_instance_v2.vaultwarden-backend-instances : instance.network[0].fixed_ip_v4]
-  database-instance_names  = [for instance in openstack_compute_instance_v2.vaultwarden-backend-instances : instance.name]
-}
-
-###########################################################################
-#
 # create deployment instances
 #
 ###########################################################################
@@ -200,7 +190,6 @@ resource "openstack_compute_instance_v2" "vaultwarden-deployment-instance" {
     private_key              = tls_private_key.deployment_key.private_key_openssh
     backend_private_ip_list  = local.backend_private_ip_list
     frontend_private_ip_list = local.frontend_private_ip_list
-    database_private_ip_list = local.database_private_ip_list
   })
 }
 
@@ -234,7 +223,10 @@ resource "openstack_compute_instance_v2" "vaultwarden-frontend-instances" {
   network {
     uuid = openstack_networking_network_v2.terraform-network-1.id
   }
-  user_data = file("${path.module}/scripts/dummyLoadBalancer.tpl")
+  user_data = templatefile("${path.module}/scripts/dummyLoadBalancer.tpl", {
+    instance_number = count.index + 1
+    public_key      = tls_private_key.deployment_key.public_key_openssh
+  })
 }
 
 locals {
@@ -305,16 +297,16 @@ resource "openstack_lb_loadbalancer_v2" "lb-frontend" {
 }
 
 resource "openstack_lb_listener_v2" "listener-frontend" {
-  protocol         = "HTTP"
-  protocol_port    = 80
+  protocol         = "TCP"
+  protocol_port    = 443
   loadbalancer_id  = openstack_lb_loadbalancer_v2.lb-frontend.id
   connection_limit = 1024
 }
 
 resource "openstack_lb_pool_v2" "pool-frontend" {
   name        = "pool-frontend"
-  protocol    = "HTTP"
-  lb_method   = "ROUND_ROBIN"
+  protocol    = "TCP"
+  lb_method   = "SOURCE_IP"
   listener_id = openstack_lb_listener_v2.listener-frontend.id
 }
 
@@ -325,7 +317,7 @@ resource "openstack_lb_members_v2" "members-frontend" {
   member {
     name          = each.key
     address       = openstack_compute_instance_v2.vaultwarden-frontend-instances[each.value].access_ip_v4
-    protocol_port = 80
+    protocol_port = 443
     backup        = each.key == 2 ? true : false
   }
 }
@@ -363,11 +355,11 @@ resource "openstack_networking_floatingip_v2" "fip-frontend" {
 
 
 output "backend_vip_addr" {
-  value = openstack_networking_floatingip_v2.fip-backend
+  value = openstack_networking_floatingip_v2.fip-backend.address
 }
 
 output "frontent_vip_addr" {
-  value = openstack_networking_floatingip_v2.fip-frontend
+  value = openstack_networking_floatingip_v2.fip-frontend.address
 }
 
 output "backend_private_IPs" {
