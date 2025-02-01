@@ -45,7 +45,7 @@ module "network" {
   subnet_name     = "${var.group_name}-terraform-subnet-1"
   cidr            = "192.168.255.0/24"
   dns_nameservers = var.dns_servers
-  router_name     = "CloudServ7-router"
+  router_name     = var.router_name
 }
 
 ###########################################################################
