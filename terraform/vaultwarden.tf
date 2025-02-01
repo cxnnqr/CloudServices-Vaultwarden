@@ -1,28 +1,11 @@
 # Define OpenStack project config etc.
 locals {
-  cacert_file = "../os-trusted-cas"
-  router_name = "CloudServ7-router"
-  dns_servers = ["10.33.16.100", "8.8.8.8"]
+  cacert_file = "../os-trusted-cas"         #!!!
+  router_name = "CloudServ7-router"         #!!!
+  dns_servers = ["10.33.16.100", "8.8.8.8"] #!!!
   pubnet_name = "ext_net"
   image_name  = "ubuntu-22.04-jammy-server-cloud-image-amd64"
   flavor_name = "m1.small"
-}
-
-# Define OpenStack provider
-terraform {
-  required_version = ">= 0.14.0"
-  required_providers {
-    openstack = {
-      source  = "terraform-provider-openstack/openstack"
-      version = ">= 1.46.0"
-    }
-  }
-}
-
-# Configure the OpenStack Provider
-provider "openstack" {
-  cloud       = "openstack"
-  cacert_file = local.cacert_file
 }
 
 ###########################################################################
@@ -31,23 +14,11 @@ provider "openstack" {
 #
 ###########################################################################
 
-# import keypair, if public_key is not specified, create new keypair to use
-resource "openstack_compute_keypair_v2" "terraform-keypair" {
-  name       = "my-terraform-pubkey"
-  public_key = file("~/.ssh/id_rsa_OpenStackHsFulda.pub")
-}
-
-##########################################################################
-# generate an SSH keypair for communication of deployment instance with others
-resource "tls_private_key" "deployment_key" {
-  algorithm = "RSA"
-  rsa_bits  = 4096
-}
-
-# create an OpenStack keypair resource from the Terraform-generated public key
-resource "openstack_compute_keypair_v2" "bastion_keypair" {
-  name       = "delpoyment_ssh_key"
-  public_key = tls_private_key.deployment_key.public_key_openssh
+module "keypairs" {
+  source                    = "./modules/keypairs"
+  terraform_keypair_name    = "${var.group_name}-terraform-pubkey"
+  terraform_public_key_path = var.public_key
+  deployment_keypair_name   = "deployment_ssh_key"
 }
 
 ###########################################################################
@@ -56,49 +27,10 @@ resource "openstack_compute_keypair_v2" "bastion_keypair" {
 #
 ###########################################################################
 
-resource "openstack_networking_secgroup_v2" "terraform-secgroup" {
-  name        = "my-terraform-secgroup"
-  description = "for terraform instances"
-}
-
-resource "openstack_networking_secgroup_rule_v2" "terraform-secgroup-rule-http" {
-  direction      = "ingress"
-  ethertype      = "IPv4"
-  protocol       = "tcp"
-  port_range_min = 80
-  port_range_max = 80
-  #remote_ip_prefix  = "0.0.0.0/0"
-  security_group_id = openstack_networking_secgroup_v2.terraform-secgroup.id
-}
-
-resource "openstack_networking_secgroup_rule_v2" "terraform-secgroup-rule-ssh" {
-  direction      = "ingress"
-  ethertype      = "IPv4"
-  protocol       = "tcp"
-  port_range_min = 22
-  port_range_max = 22
-  #remote_ip_prefix  = "0.0.0.0/0"
-  security_group_id = openstack_networking_secgroup_v2.terraform-secgroup.id
-}
-
-resource "openstack_networking_secgroup_rule_v2" "terraform-secgroup-rule-prometheus" {
-  direction      = "ingress"
-  ethertype      = "IPv4"
-  protocol       = "tcp"
-  port_range_min = 9090
-  port_range_max = 9090
-  #remote_ip_prefix  = "0.0.0.0/0"
-  security_group_id = openstack_networking_secgroup_v2.terraform-secgroup.id
-}
-
-resource "openstack_networking_secgroup_rule_v2" "terraform-secgroup-rule-grafana" {
-  direction      = "ingress"
-  ethertype      = "IPv4"
-  protocol       = "tcp"
-  port_range_min = 3000
-  port_range_max = 3000
-  #remote_ip_prefix  = "0.0.0.0/0"
-  security_group_id = openstack_networking_secgroup_v2.terraform-secgroup.id
+module "security" {
+  source               = "./modules/security"
+  secgroup_name        = "${var.group_name}-terraform-secgroup"
+  secgroup_description = "for terraform instances"
 }
 
 ###########################################################################
@@ -107,26 +39,13 @@ resource "openstack_networking_secgroup_rule_v2" "terraform-secgroup-rule-grafan
 #
 ###########################################################################
 
-resource "openstack_networking_network_v2" "terraform-network-1" {
-  name           = "my-terraform-network-1"
-  admin_state_up = "true"
-}
-
-resource "openstack_networking_subnet_v2" "terraform-subnet-1" {
-  name            = "my-terraform-subnet-1"
-  network_id      = openstack_networking_network_v2.terraform-network-1.id
+module "network" {
+  source          = "./modules/network"
+  network_name    = "${var.group_name}-terraform-network-1"
+  subnet_name     = "${var.group_name}-terraform-subnet-1"
   cidr            = "192.168.255.0/24"
-  ip_version      = 4
-  dns_nameservers = local.dns_servers
-}
-
-data "openstack_networking_router_v2" "router-1" {
-  name = local.router_name
-}
-
-resource "openstack_networking_router_interface_v2" "router_interface_1" {
-  router_id = data.openstack_networking_router_v2.router-1.id
-  subnet_id = openstack_networking_subnet_v2.terraform-subnet-1.id
+  dns_nameservers = var.dns_servers
+  router_name     = "CloudServ7-router"
 }
 
 ###########################################################################
@@ -139,17 +58,17 @@ resource "openstack_compute_instance_v2" "vaultwarden-backend-instances" {
   name            = "vaultwarden-backend-instance-${count.index + 1}"
   image_name      = local.image_name
   flavor_name     = local.flavor_name
-  key_pair        = openstack_compute_keypair_v2.terraform-keypair.name
-  security_groups = [openstack_networking_secgroup_v2.terraform-secgroup.name]
+  key_pair        = module.keypairs.terraform_keypair_name
+  security_groups = [module.security.secgroup_name]
 
-  depends_on = [openstack_networking_subnet_v2.terraform-subnet-1]
+  depends_on = [module.network.openstack_networking_subnet_v2]
 
   network {
-    uuid = openstack_networking_network_v2.terraform-network-1.id
+    uuid = module.network.network_id
   }
   user_data = templatefile("${path.module}/scripts/dummyLoadBalancer.tpl", {
     instance_number = count.index + 1
-    public_key      = tls_private_key.deployment_key.public_key_openssh
+    public_key      = module.keypairs.deployment_public_key
   })
 }
 
@@ -168,17 +87,17 @@ resource "openstack_compute_instance_v2" "vaultwarden-deployment-instance" {
   name            = "vaultwarden-deployment-instance"
   image_name      = local.image_name
   flavor_name     = "m1.large"
-  key_pair        = openstack_compute_keypair_v2.terraform-keypair.name
-  security_groups = [openstack_networking_secgroup_v2.terraform-secgroup.name]
+  key_pair        = module.keypairs.terraform_keypair_name
+  security_groups = [module.security.secgroup_name]
 
-  depends_on = [openstack_networking_subnet_v2.terraform-subnet-1]
+  depends_on = [module.network.openstack_networking_subnet_v2]
 
   network {
-    uuid = openstack_networking_network_v2.terraform-network-1.id
+    uuid = module.network.network_id
   }
   user_data = templatefile("${path.module}/scripts/deployment_cloudinit_script.tpl", {
-    public_key               = tls_private_key.deployment_key.public_key_openssh
-    private_key              = tls_private_key.deployment_key.private_key_openssh
+    public_key               = module.keypairs.deployment_public_key
+    private_key              = module.keypairs.deployment_private_key
     backend_private_ip_list  = local.backend_private_ip_list
     frontend_private_ip_list = local.frontend_private_ip_list
   })
@@ -205,17 +124,17 @@ resource "openstack_compute_instance_v2" "vaultwarden-frontend-instances" {
   name            = "vaultwarden-frontend-instance-${count.index + 1}"
   image_name      = local.image_name
   flavor_name     = local.flavor_name
-  key_pair        = openstack_compute_keypair_v2.terraform-keypair.name
-  security_groups = [openstack_networking_secgroup_v2.terraform-secgroup.name]
+  key_pair        = module.keypairs.terraform_keypair_name
+  security_groups = [module.security.secgroup_name]
 
-  depends_on = [openstack_networking_subnet_v2.terraform-subnet-1]
+  depends_on = [module.network.openstack_networking_subnet_v2]
 
   network {
-    uuid = openstack_networking_network_v2.terraform-network-1.id
+    uuid = module.network.network_id
   }
   user_data = templatefile("${path.module}/scripts/dummyLoadBalancer.tpl", {
     instance_number = count.index + 1
-    public_key      = tls_private_key.deployment_key.public_key_openssh
+    public_key      = module.keypairs.deployment_public_key
   })
 }
 
@@ -231,7 +150,7 @@ locals {
 ###########################################################################
 resource "openstack_lb_loadbalancer_v2" "lb-backend" {
   name          = "lb-backend"
-  vip_subnet_id = openstack_networking_subnet_v2.terraform-subnet-1.id
+  vip_subnet_id = module.network.subnet_id
 }
 
 resource "openstack_lb_listener_v2" "listener-backend" {
@@ -280,7 +199,7 @@ resource "openstack_lb_monitor_v2" "monitor-backend" {
 ###########################################################################
 resource "openstack_lb_loadbalancer_v2" "lb-frontend" {
   name          = "lb-frontend"
-  vip_subnet_id = openstack_networking_subnet_v2.terraform-subnet-1.id
+  vip_subnet_id = module.network.subnet_id
 }
 
 resource "openstack_lb_listener_v2" "listener-frontend" {
@@ -339,26 +258,26 @@ resource "openstack_networking_floatingip_v2" "fip-frontend" {
 }
 
 
-output "backend_vip_addr" {
-  value = openstack_networking_floatingip_v2.fip-backend.address
-}
+# output "backend_vip_addr" {
+#   value = openstack_networking_floatingip_v2.fip-backend.address
+# }
 
-output "frontent_vip_addr" {
-  value = openstack_networking_floatingip_v2.fip-frontend.address
-}
+# output "frontent_vip_addr" {
+#   value = openstack_networking_floatingip_v2.fip-frontend.address
+# }
 
-output "backend_private_IPs" {
-  value = local.backend_private_ip_list
-}
+# output "backend_private_IPs" {
+#   value = local.backend_private_ip_list
+# }
 
-output "backend_instance_names" {
-  value = local.backend-instance_names
-}
+# output "backend_instance_names" {
+#   value = local.backend-instance_names
+# }
 
-output "frontend_private_IPs" {
-  value = local.frontend_private_ip_list
-}
+# output "frontend_private_IPs" {
+#   value = local.frontend_private_ip_list
+# }
 
-output "frontend_instance_names" {
-  value = local.frontend-instance_names
-}
+# output "frontend_instance_names" {
+#   value = local.frontend-instance_names
+# }
