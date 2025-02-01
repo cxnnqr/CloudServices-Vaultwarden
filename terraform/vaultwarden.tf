@@ -25,8 +25,6 @@ provider "openstack" {
   cacert_file = local.cacert_file
 }
 
-
-
 ###########################################################################
 #
 # create keypairs
@@ -51,10 +49,6 @@ resource "openstack_compute_keypair_v2" "bastion_keypair" {
   name       = "delpoyment_ssh_key"
   public_key = tls_private_key.deployment_key.public_key_openssh
 }
-
-
-
-
 
 ###########################################################################
 #
@@ -135,8 +129,6 @@ resource "openstack_networking_router_interface_v2" "router_interface_1" {
   subnet_id = openstack_networking_subnet_v2.terraform-subnet-1.id
 }
 
-
-
 ###########################################################################
 #
 # create backend instances
@@ -166,10 +158,9 @@ locals {
   backend-instance_names  = [for instance in openstack_compute_instance_v2.vaultwarden-backend-instances : instance.name]
 }
 
-
 ###########################################################################
 #
-# create deployment instances
+# create deployment instance
 #
 ###########################################################################
 
@@ -204,7 +195,6 @@ resource "openstack_compute_instance_v2" "vaultwarden-deployment-instance" {
 #   port_id     = openstack_compute_instance_v2.vaultwarden-test-terraform-instance-3.network.0.port
 # }
 
-
 ###########################################################################
 #
 # create frontend instances
@@ -233,8 +223,6 @@ locals {
   frontend_private_ip_list = [for instance in openstack_compute_instance_v2.vaultwarden-frontend-instances : instance.network[0].fixed_ip_v4]
   frontend-instance_names  = [for instance in openstack_compute_instance_v2.vaultwarden-frontend-instances : instance.name]
 }
-
-
 
 ###########################################################################
 #
@@ -284,7 +272,6 @@ resource "openstack_lb_monitor_v2" "monitor-backend" {
 
   depends_on = [openstack_lb_loadbalancer_v2.lb-backend, openstack_lb_listener_v2.listener-backend, openstack_lb_pool_v2.pool-backend, openstack_lb_members_v2.members-backend]
 }
-
 
 ###########################################################################
 #
@@ -336,7 +323,6 @@ resource "openstack_lb_monitor_v2" "monitor-frontend" {
 
 }
 
-
 ###########################################################################
 #
 # assign floating ip to load balancers
@@ -351,7 +337,6 @@ resource "openstack_networking_floatingip_v2" "fip-frontend" {
   pool    = local.pubnet_name
   port_id = openstack_lb_loadbalancer_v2.lb-frontend.vip_port_id
 }
-
 
 
 output "backend_vip_addr" {
