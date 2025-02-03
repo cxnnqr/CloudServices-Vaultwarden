@@ -16,6 +16,11 @@ variable "cacert_file" {
   default     = "../os-trusted-cas"
 }
 
+variable "pubnet_name" {
+  description = "Name of the public network"
+  type        = string
+}
+
 variable "dns_servers" {
   type    = list(string)
   default = ["10.33.16.100", "8.8.8.8"]

@@ -1,10 +1,10 @@
 output "backend_vip_addr" {
-  value       = openstack_networking_floatingip_v2.fip-backend.address
+  value       = module.loadbalancer.backend_vip_addr
   description = "IP address of the backend load balancer"
 }
 
 output "frontend_vip_addr" {
-  value       = openstack_networking_floatingip_v2.fip-frontend.address
+  value       = module.loadbalancer.frontend_vip_addr
   description = "IP address of the frontend load balancer"
 }
 

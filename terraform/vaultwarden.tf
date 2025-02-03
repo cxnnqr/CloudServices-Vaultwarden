@@ -1,11 +1,11 @@
 # Define OpenStack project config etc.
 locals {
-  cacert_file = "../os-trusted-cas"         #!!!
-  router_name = "CloudServ7-router"         #!!!
-  dns_servers = ["10.33.16.100", "8.8.8.8"] #!!!
-  pubnet_name = "ext_net"
-  image_name  = "ubuntu-22.04-jammy-server-cloud-image-amd64"
-  flavor_name = "m1.small"
+  cacert_file = "../os-trusted-cas"                           #!!!
+  router_name = "CloudServ7-router"                           #!!!
+  dns_servers = ["10.33.16.100", "8.8.8.8"]                   #!!!
+  pubnet_name = "ext_net"                                     #!!!
+  image_name  = "ubuntu-22.04-jammy-server-cloud-image-amd64" #!!!
+  flavor_name = "m1.small"                                    #!!!
 }
 
 ###########################################################################
@@ -78,145 +78,23 @@ module "compute" {
 
 ###########################################################################
 #
-# create load balancer for backend instances
+# create load balancers (backend and frontend)
 #
 ###########################################################################
-resource "openstack_lb_loadbalancer_v2" "lb-backend" {
-  name          = "lb-backend"
-  vip_subnet_id = module.network.subnet_id
+
+module "loadbalancer" {
+  # general variables
+  source      = "./modules/loadbalancer"
+  pubnet_name = var.pubnet_name
+  subnet_id   = module.network.subnet_id
+  # backend variables
+  backend_instances     = module.compute.backend_instances
+  backend_protocol      = "HTTP"
+  backend_protocol_port = 80
+  backend_lb_method     = "ROUND_ROBIN"
+  # frontend variables
+  frontend_instances     = module.compute.frontend_instances
+  frontend_protocol      = "HTTP"        #"TCP" ----> Set to TCP for production
+  frontend_protocol_port = 80            #443 ----> Set to 443 for production
+  frontend_lb_method     = "ROUND_ROBIN" #"SOURCE_IP" ----> Set to SOURCE_IP for production
 }
-
-resource "openstack_lb_listener_v2" "listener-backend" {
-  protocol         = "HTTP"
-  protocol_port    = 80
-  loadbalancer_id  = openstack_lb_loadbalancer_v2.lb-backend.id
-  connection_limit = 1024
-}
-
-resource "openstack_lb_pool_v2" "pool-backend" {
-  name        = "pool-backend"
-  protocol    = "HTTP"
-  lb_method   = "ROUND_ROBIN"
-  listener_id = openstack_lb_listener_v2.listener-backend.id
-}
-
-resource "openstack_lb_members_v2" "members-backend" {
-  pool_id = openstack_lb_pool_v2.pool-backend.id
-  dynamic "member" {
-    for_each = module.compute.backend_instances
-    content {
-      name          = member.value.name
-      address       = member.value.access_ip_v4
-      protocol_port = 80
-      subnet_id     = module.network.subnet_id
-      backup        = index(keys(module.compute.backend_instances), member.key) == length(module.compute.backend_instances) - 1 ? true : false
-    }
-  }
-  depends_on = [module.compute]
-}
-
-resource "openstack_lb_monitor_v2" "monitor-backend" {
-  pool_id        = openstack_lb_pool_v2.pool-backend.id
-  type           = "HTTP"
-  delay          = 5
-  timeout        = 5
-  max_retries    = 3
-  http_method    = "GET"
-  url_path       = "/"
-  expected_codes = 200
-
-  depends_on = [openstack_lb_loadbalancer_v2.lb-backend, openstack_lb_listener_v2.listener-backend, openstack_lb_pool_v2.pool-backend, openstack_lb_members_v2.members-backend, module.compute]
-}
-
-###########################################################################
-#
-# create load balancer for frontend instances
-#
-###########################################################################
-resource "openstack_lb_loadbalancer_v2" "lb-frontend" {
-  name          = "lb-frontend"
-  vip_subnet_id = module.network.subnet_id
-}
-
-resource "openstack_lb_listener_v2" "listener-frontend" {
-  protocol         = "TCP"
-  protocol_port    = 80 #443
-  loadbalancer_id  = openstack_lb_loadbalancer_v2.lb-frontend.id
-  connection_limit = 1024
-}
-
-resource "openstack_lb_pool_v2" "pool-frontend" {
-  name        = "pool-frontend"
-  protocol    = "HTTP"        #"TCP"
-  lb_method   = "ROUND_ROBIN" #"SOURCE_IP"
-  listener_id = openstack_lb_listener_v2.listener-frontend.id
-}
-
-resource "openstack_lb_members_v2" "members-frontend" {
-  pool_id = openstack_lb_pool_v2.pool-frontend.id
-  dynamic "member" {
-    for_each = module.compute.frontend_instances
-    content {
-      name          = member.value.name
-      address       = member.value.access_ip_v4
-      protocol_port = 80 #443
-      subnet_id     = module.network.subnet_id
-    }
-  }
-  depends_on = [module.compute]
-}
-
-resource "openstack_lb_monitor_v2" "monitor-frontend" {
-  pool_id        = openstack_lb_pool_v2.pool-frontend.id
-  type           = "HTTP"
-  delay          = 5
-  timeout        = 5
-  max_retries    = 3
-  http_method    = "GET"
-  url_path       = "/"
-  expected_codes = 200
-
-  depends_on = [openstack_lb_loadbalancer_v2.lb-frontend, openstack_lb_listener_v2.listener-frontend, openstack_lb_pool_v2.pool-frontend, openstack_lb_members_v2.members-frontend, module.compute]
-
-}
-
-###########################################################################
-#
-# assign floating ip to load balancers
-#
-###########################################################################
-resource "openstack_networking_floatingip_v2" "fip-backend" {
-  pool    = local.pubnet_name
-  port_id = openstack_lb_loadbalancer_v2.lb-backend.vip_port_id
-}
-
-resource "openstack_networking_floatingip_v2" "fip-frontend" {
-  pool    = local.pubnet_name
-  port_id = openstack_lb_loadbalancer_v2.lb-frontend.vip_port_id
-}
-
-
-# output "backend_vip_addr" {
-#   value = openstack_networking_floatingip_v2.fip-backend.address
-# }
-
-# output "frontent_vip_addr" {
-#   value = openstack_networking_floatingip_v2.fip-frontend.address
-# }
-
-# output "backend_private_IPs" {
-#   value = local.backend_private_ip_list
-# }
-
-# output "backend_instance_names" {
-#   value = local.backend-instance_names
-# }
-
-# output "frontend_private_IPs" {
-#   value = local.frontend_private_ip_list
-# }
-
-# output "frontend_instance_names" {
-#   value = local.frontend-instance_names
-# }
-
