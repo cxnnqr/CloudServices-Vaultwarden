@@ -12,4 +12,6 @@ terraform.tfstate.backup
 # Ignore sensitive variable files
 *.tfvars
 
+tf.plan
+tf.plan.backup
 .DS_Store
