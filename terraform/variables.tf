@@ -26,3 +26,19 @@ variable "router_name" {
   default = "CloudServX-router"
 }
 
+variable "global_image_name" {
+  type        = string
+  description = "Name of the image to use for all the instances"
+}
+
+variable "backend_instance_count" {
+  type        = number
+  description = "Number of backend instances to create"
+  default     = 2
+}
+
+variable "frontend_instance_count" {
+  type        = number
+  description = "Number of frontend instances to create"
+  default     = 2
+}
