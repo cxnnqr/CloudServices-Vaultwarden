@@ -1,0 +1,8 @@
+public_key              = <PATH_TO_PUBLIC_KEY>
+group_name              = <GROUP_NAME>
+router_name             = <ROUTER_NAME>
+global_image_name       = <GLOBAL_IMAGE_NAME>
+backend_instance_count  = 2
+frontend_instance_count = 3
+pubnet_name             = "ext_net"
+dns_nameservers         = ["8.8.8.8"]
