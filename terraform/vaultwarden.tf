@@ -41,7 +41,7 @@ module "network" {
   network_name    = "${var.group_name}-terraform-network-1"
   subnet_name     = "${var.group_name}-terraform-subnet-1"
   cidr            = "192.168.255.0/24"
-  dns_nameservers = var.dns_servers
+  dns_nameservers = var.dns_nameservers
   router_name     = var.router_name
 }
 
@@ -50,7 +50,6 @@ module "network" {
 # create compute instances (deployment, backend, frontend)
 #
 ###########################################################################
-
 module "compute" {
   # general variables
   source                 = "./modules/compute"
@@ -81,7 +80,6 @@ module "compute" {
 # create load balancers (backend and frontend)
 #
 ###########################################################################
-
 module "loadbalancer" {
   # general variables
   source      = "./modules/loadbalancer"

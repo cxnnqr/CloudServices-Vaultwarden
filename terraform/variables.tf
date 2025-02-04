@@ -21,9 +21,9 @@ variable "pubnet_name" {
   type        = string
 }
 
-variable "dns_servers" {
+variable "dns_nameservers" {
   type    = list(string)
-  default = ["10.33.16.100", "8.8.8.8"]
+  default = ["8.8.8.8"]
 }
 
 variable "router_name" {
@@ -38,12 +38,12 @@ variable "global_image_name" {
 
 variable "backend_instance_count" {
   type        = number
-  description = "Number of backend instances to create"
+  description = "Number of backend instances to create. Only failover so 2 is enough"
   default     = 2
 }
 
 variable "frontend_instance_count" {
   type        = number
-  description = "Number of frontend instances to create"
-  default     = 2
+  description = "Number of frontend instances to create. High availability so odd numbers recommended"
+  default     = 3
 }
