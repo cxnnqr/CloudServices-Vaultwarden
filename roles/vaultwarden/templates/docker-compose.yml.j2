@@ -1,0 +1,25 @@
+name: 'vaultwarden'
+
+networks:
+  default:
+    enable_ipv6: true
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 'fdca:fe31:e2f1::/48'
+
+services:
+  vault:
+    environment:
+      ADMIN_TOKEN: '{{ ADMIN_TOKEN }}'
+      RUST_BACKTRACE: 1
+    image: 'vaultwarden/server:latest'
+    restart: 'unless-stopped'
+    ports:
+      - "80:80"
+    volumes:
+      - 'vault:/data'
+
+volumes:
+  vault:

@@ -1,0 +1,20 @@
+- name: Create Vaultwarden Config Directory
+  ansible.builtin.file:
+    path: "{{ vaultwarden_project_dir }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Install Docker compose config
+  ansible.builtin.template:
+    src: docker-compose.yml.j2
+    dest: /opt/vaultwarden/docker-compose.yml
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Ensure Docker Compose services are using the latest images
+  community.docker.docker_compose_v2:
+    project_src: "{{ vaultwarden_project_dir }}"
+    state: present
