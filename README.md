@@ -88,3 +88,42 @@ The configuration includes security groups with rules for:
 - `loadbalancer/`: Load balancer configurations
 - `network/`: Network and subnet setup
 - `security/`: Security group definitions
+
+## Licenses
+
+This project uses several open-source components that are licensed under different terms:
+
+### Infrastructure Components
+
+- **Terraform** - Mozilla Public License 2.0 (MPL-2.0)
+- **OpenStack Provider for Terraform** - Mozilla Public License 2.0 (MPL-2.0)
+
+### Monitoring Stack
+
+- **Prometheus** - Apache License 2.0
+- **Node Exporter** - Apache License 2.0
+- **Grafana** - GNU Affero General Public License v3.0 (AGPL-3.0)
+
+### Development Tools
+
+- **Ansible** - GNU General Public License v3.0 (GPL-3.0)
+- **Docker** (via Ansible collection) - Apache License 2.0
+
+### Operating System and Packages
+
+- **Ubuntu** - Various open-source licenses (primarily GPL and LGPL)
+- **Python3** - Python Software Foundation License (PSF)
+
+### Note on License Compliance
+
+When using this project, ensure you comply with all the licenses of the components used. Key points:
+
+1. The Grafana AGPL-3.0 license requires that if you modify and distribute Grafana, you must make your modifications available under the same license.
+
+2. The MPL-2.0 license (Terraform) requires that any modifications to the covered files must be released under MPL-2.0.
+
+3. For detailed license information and compliance requirements, please refer to the respective project websites:
+   - Terraform: https://github.com/hashicorp/terraform/blob/main/LICENSE
+   - Prometheus: https://github.com/prometheus/prometheus/blob/main/LICENSE
+   - Grafana: https://github.com/grafana/grafana/blob/main/LICENSE
+   - Ansible: https://github.com/ansible/ansible/blob/devel/COPYING
