@@ -45,3 +45,14 @@ output "frontend_private_ip_list" {
   description = "private IPs of the frontend instances"
   value       = openstack_compute_instance_v2.vaultwarden-frontend-instances[*].network[0].fixed_ip_v4
 }
+
+###########################################################################
+#
+# deployment outputs
+#
+###########################################################################
+
+output "deployment_floating_ip" {
+  description = "floating IP of the deployment instance"
+  value       = openstack_networking_floatingip_v2.deployment_floating_ip.address
+}

@@ -57,6 +57,7 @@ module "compute" {
   secgroup_name          = module.security.secgroup_name
   network_id             = module.network.network_id
   deployment_public_key  = module.keypairs.deployment_public_key
+  pubnet_name            = var.pubnet_name
   # backend variables
   backend_instance_count = var.backend_instance_count
   backend_image_name     = var.global_image_name
@@ -67,7 +68,7 @@ module "compute" {
   frontend_flavor_name    = "m1.small"
   # deployment variables
   deployment_image_name    = var.global_image_name
-  deployment_flavor_name   = "m1.large"
+  deployment_flavor_name   = "m1.medium"
   deployment_private_key   = module.keypairs.deployment_private_key
   backend_private_ip_list  = module.compute.backend_private_ip_list
   frontend_private_ip_list = module.compute.frontend_private_ip_list

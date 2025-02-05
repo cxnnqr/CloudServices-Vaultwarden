@@ -23,6 +23,11 @@ variable "deployment_public_key" {
   type        = string
 }
 
+variable "pubnet_name" {
+  description = "Name of the public network"
+  type        = string
+}
+
 ###########################################################################
 #
 # deployment
@@ -35,7 +40,7 @@ variable "deployment_image_name" {
 }
 
 variable "deployment_flavor_name" {
-  description = "Name of the flavor to use for the deployment instance"
+  description = "Name of the flavor to use for the deployment instance. OPTIONS: m1.small, m1.medium, m1.large"
   type        = string
   default     = "m1.small"
 }
@@ -73,7 +78,7 @@ variable "backend_image_name" {
 }
 
 variable "backend_flavor_name" {
-  description = "Name of the flavor/instance type to use"
+  description = "Name of the flavor/instance type to use. OPTIONS: m1.small, m1.medium, m1.large"
   type        = string
   default     = "m1.small"
 }
@@ -97,7 +102,7 @@ variable "frontend_image_name" {
 }
 
 variable "frontend_flavor_name" {
-  description = "Name of the flavor to use for frontend instances"
+  description = "Name of the flavor to use for frontend instances. OPTIONS: m1.small, m1.medium, m1.large"
   type        = string
   default     = "m1.small"
 }
