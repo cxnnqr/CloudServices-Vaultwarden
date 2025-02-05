@@ -1,0 +1,9 @@
+---
+galaxy_info:
+  author: maximizzar
+  description: "A role that sets up docker from docker.io."
+  company: "maximizzar.io"
+  license: "AGPLv3"
+
+become: true
+dependencies: []

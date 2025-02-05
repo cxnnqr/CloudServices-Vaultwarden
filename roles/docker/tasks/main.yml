@@ -1,0 +1,7 @@
+- name: Determine the OS distribution
+  set_fact:
+    distribution: "{{ ansible_facts['distribution'] }}"
+
+- name: Include OS-specific Docker installation tasks
+  include_tasks: "{{ distribution | lower }}.yml"
+  when: distribution in ['CentOS', 'Debian', 'Fedora', 'RedHat', 'SLES', 'Ubuntu']
