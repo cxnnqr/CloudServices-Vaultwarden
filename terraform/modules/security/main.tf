@@ -39,6 +39,24 @@ resource "openstack_networking_secgroup_rule_v2" "terraform-secgroup-rule-promet
   port_range_max    = 9090
 }
 
+resource "openstack_networking_secgroup_rule_v2" "terraform-secgroup-rule-node-exporter" {
+  security_group_id = openstack_networking_secgroup_v2.terraform-secgroup.id
+  direction         = "ingress"
+  ethertype         = "IPv4"
+  protocol          = "tcp"
+  port_range_min    = 9100
+  port_range_max    = 9100
+}
+
+resource "openstack_networking_secgroup_rule_v2" "terraform-secgroup-loki" {
+  security_group_id = openstack_networking_secgroup_v2.terraform-secgroup.id
+  direction         = "ingress"
+  ethertype         = "IPv4"
+  protocol          = "tcp"
+  port_range_min    = 3100
+  port_range_max    = 9100
+}
+
 resource "openstack_networking_secgroup_rule_v2" "terraform-secgroup-rule-grafana" {
   security_group_id = openstack_networking_secgroup_v2.terraform-secgroup.id
   direction         = "ingress"
