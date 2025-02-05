@@ -1,0 +1,14 @@
+- name: Upgrade all system packages
+  ansible.builtin.package:
+    name: "*"
+    state: latest
+
+- name: Install Admin tools
+  ansible.builtin.package:
+    name:
+      - btop
+      - iftop
+      - iputils-ping
+
+# WIP
+# - name: Install Prometheus Node Exporter

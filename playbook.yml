@@ -1,0 +1,30 @@
+- name: Setup Ansible Vault
+  gather_facts: no
+  hosts: localhost
+  roles:
+    - name: ansible_vault
+      become: no
+    - name: certificate
+      become: no
+
+- name: Install Essential software
+  hosts: all
+  roles:
+    - name: essentials
+      become: yes
+
+- name: Install Vaultwarden backend in Failover config
+  hosts: vault
+  roles:
+    - name: docker
+      become: yes
+    - name: vaultwarden
+      become: yes
+
+- name: Install HA Ingress server
+  hosts: ingress
+  roles:
+    - name: nginx
+      become: yes
+
+#- name: Install Database
