@@ -2,21 +2,7 @@
 
 # Update package lists and install necessary packages
 apt-get update
-apt-get -y install apache2 python3
-
-# Configure Apache index page
-rm /var/www/html/index.html
-cat > /var/www/html/index.html << INNEREOF
-<!DOCTYPE html>
-<html>
-  <body>
-    <h1>It works!</h1>
-    <p>terraform-instance-${instance_number}</p>
-  </body>
-</html>
-INNEREOF
-sed -i "s/hostname/terraform-instance-${instance_number}/" /var/www/html/index.html
-sed -i "1s/$/ terraform-instance-${instance_number}/" /etc/hosts
+apt-get -y install python3
 
 # Add public key of deployment instance to authorized_keys
 export HOME="/home/ubuntu"
