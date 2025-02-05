@@ -47,7 +47,7 @@ resource "openstack_lb_members_v2" "members-frontend" {
 
 resource "openstack_lb_monitor_v2" "monitor-frontend" {
   pool_id        = openstack_lb_pool_v2.pool-frontend.id
-  type           = var.frontend_protocol
+  type           = "HTTP"
   delay          = 5
   timeout        = 5
   max_retries    = 3
