@@ -86,11 +86,6 @@ module "loadbalancer" {
   source      = "./modules/loadbalancer"
   pubnet_name = var.pubnet_name
   subnet_id   = module.network.subnet_id
-  # backend variables
-  backend_instances     = module.compute.backend_instances
-  backend_protocol      = "HTTP"
-  backend_protocol_port = 80
-  backend_lb_method     = "ROUND_ROBIN"
   # frontend variables
   frontend_instances     = module.compute.frontend_instances
   frontend_protocol      = "HTTP"        #"TCP" ----> Set to TCP for production

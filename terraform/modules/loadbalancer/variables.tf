@@ -9,30 +9,6 @@ variable "pubnet_name" {
   type        = string
 }
 
-# Backend Load Balancer Variables
-variable "backend_protocol" {
-  description = "Protocol for backend load balancer (e.g., HTTP, TCP)"
-  type        = string
-  default     = "HTTP"
-}
-
-variable "backend_protocol_port" {
-  description = "Port number for backend protocol"
-  type        = number
-  default     = 80
-}
-
-variable "backend_lb_method" {
-  description = "Load balancing method for backend (e.g., ROUND_ROBIN, SOURCE_IP, LEAST_CONNECTIONS)"
-  type        = string
-  default     = "ROUND_ROBIN"
-}
-
-variable "backend_instances" {
-  description = "Map of backend instances to load balance"
-  type        = map(any)
-}
-
 # Frontend Load Balancer Variables
 variable "frontend_protocol" {
   description = "Protocol for frontend load balancer (e.g., HTTP, TCP)"
