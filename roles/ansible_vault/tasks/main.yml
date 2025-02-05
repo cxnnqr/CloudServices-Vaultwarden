@@ -1,0 +1,9 @@
+- name: Check if secrets.yml exists and is encrypted
+  shell: "grep -q '$ANSIBLE_VAULT;' group_vars/all/secrets.yml"
+  register: vault_encrypted
+  ignore_errors: yes
+  changed_when: false
+
+- name: Run vault initialization tasks if needed
+  include_tasks: vault_tasks.yml
+  when: vault_encrypted.rc != 0  # Only include the file if secrets.yml is missing or not encrypted
