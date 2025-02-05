@@ -21,7 +21,6 @@ resource "openstack_compute_instance_v2" "vaultwarden-backend-instances" {
   key_pair        = var.terraform_keypair_name
   security_groups = [var.secgroup_name]
 
-  #   depends_on = [module.network.openstack_networking_subnet_v2]
 
   network {
     uuid = var.network_id
@@ -45,7 +44,7 @@ resource "openstack_compute_instance_v2" "vaultwarden-frontend-instances" {
   key_pair        = var.terraform_keypair_name
   security_groups = [var.secgroup_name]
 
-  #   depends_on = [module.network.openstack_networking_subnet_v2]
+
 
   network {
     uuid = var.network_id
@@ -68,7 +67,6 @@ resource "openstack_compute_instance_v2" "vaultwarden-deployment-instance" {
   key_pair        = var.terraform_keypair_name
   security_groups = [var.secgroup_name]
 
-  #   depends_on = [module.network.openstack_networking_subnet_v2]
 
   network {
     uuid = var.network_id
@@ -78,16 +76,19 @@ resource "openstack_compute_instance_v2" "vaultwarden-deployment-instance" {
     private_key              = var.deployment_private_key
     backend_private_ip_list  = var.backend_private_ip_list
     frontend_private_ip_list = var.frontend_private_ip_list
+    access_network           = true
   })
 }
+# allocate and associate a floating IP to the deployment instance
+resource "openstack_networking_floatingip_v2" "deployment_floating_ip" {
+  pool = var.pubnet_name
+}
 
-# # Allocate a floating IP from the external network pool
-# resource "openstack_networking_floatingip_v2" "vaultwarden_floating_ip" {
-#   pool = local.pubnet_name
-# }
+data "openstack_networking_port_v2" "deployment_port" {
+  fixed_ip = openstack_compute_instance_v2.vaultwarden-deployment-instance.network[0].fixed_ip_v4
+}
 
-# # Associate the floating IP with the instance's port
-# resource "openstack_networking_floatingip_associate_v2" "vaultwarden_fip_assoc" {
-#   floating_ip = openstack_networking_floatingip_v2.vaultwarden_floating_ip.address
-#   port_id     = openstack_compute_instance_v2.vaultwarden-test-terraform-instance-3.network.0.port
-# }
+resource "openstack_networking_floatingip_associate_v2" "deployment_floating_ip_association" {
+  floating_ip = openstack_networking_floatingip_v2.deployment_floating_ip.address
+  port_id     = data.openstack_networking_port_v2.deployment_port.id
+}
