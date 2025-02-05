@@ -1,0 +1,49 @@
+upstream backend {
+    {% for host in groups['vault'] %}
+    server {{ host }}:80;
+    {% endfor %}
+}
+
+server {
+    listen                  443 ssl default_server;
+    listen                  [::]:443 ssl default_server;
+    http2                   on;
+    server_name             _;
+
+    # SSL
+    ssl_certificate /etc/ssl/certs/root.pem;
+    ssl_certificate_key /etc/ssl/private/root.key;
+
+    # security
+    include                 conf.d/security/*.conf;
+
+    # logging
+    access_log              /var/log/nginx/access.log combined buffer=512k flush=1m;
+    error_log               /var/log/nginx/error.log warn;
+
+    # reverse proxy
+    location / {
+        proxy_pass            http://backend;
+        proxy_set_header      Host $host;
+        include               conf.d/proxy/tcp.conf;
+    }
+
+    # additional config
+    include conf.d/general/gzip.conf;
+    include conf.d/general/robots.conf;
+}
+
+# HTTP redirect
+server {
+    listen      80 default_server;
+    listen      [::]:80 default_server;
+    server_name _;
+
+    # logging
+    error_log   /var/log/nginx/bookstack.error.log warn;
+    include     conf.d/general/letsencrypt.conf;
+
+    location / {
+        return 301 https://$host$request_uri;
+    }
+}

@@ -1,0 +1,15 @@
+- name: Copy the TLS certificate (root.pem)
+  copy:
+    src: roles/certificate/files/root.pem
+    dest: /etc/ssl/certs/root.pem
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Copy the TLS private key (root.key)
+  copy:
+    src: roles/certificate/files/root.key
+    dest: /etc/ssl/private/root.key
+    owner: root
+    group: root
+    mode: '0600'

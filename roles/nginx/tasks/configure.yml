@@ -1,0 +1,39 @@
+- name: Deploy custom nginx.conf
+  ansible.builtin.copy:
+    src: files/nginx.conf
+    dest: /etc/nginx/nginx.conf
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Ensure conf.d directory exists
+  ansible.builtin.file:
+    path: /etc/nginx/conf.d
+    state: directory
+    mode: '0755'
+
+- name: Copy all configuration files and subdirectories
+  ansible.builtin.copy:
+    src: files/conf.d/
+    dest: /etc/nginx/conf.d/
+    owner: root
+    group: root
+    mode: '0644'
+    directory_mode: '0755'
+
+- name: Deploy custom nginx.conf
+  ansible.builtin.copy:
+    src: files/nginx.conf
+    dest: /etc/nginx/nginx.conf
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Deploy backend upstream configuration
+  ansible.builtin.template:
+    src: templates/backend.conf.j2
+    dest: /etc/nginx/conf.d/backend.conf
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Reload Nginx

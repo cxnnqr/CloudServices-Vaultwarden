@@ -1,0 +1,8 @@
+- name: Certificates
+  include_tasks: certificates.yml
+
+- name: Installation
+  include_tasks: install.yml
+
+- name: Configuration
+  include_tasks: configure.yml
