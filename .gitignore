@@ -17,6 +17,7 @@ tf.plan.backup
 .DS_Store
 
 # Ansible
-./ansible.log
-./group_vars/all/secrets.yml
-./inventory
+ansible.log
+/group_vars/all/secrets.yml
+inventory
+/roles/certificate/files

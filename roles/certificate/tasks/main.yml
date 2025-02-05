@@ -1,0 +1,25 @@
+- name: Ensure the directory for certificates exists
+  file:
+    path: "{{ role_path }}/files"
+    state: directory
+    mode: '0755'
+
+# root.key
+- name: Check if root.key exists
+  stat:
+    path: "{{ role_path }}/files/root.key"
+  register: root_key_stat
+
+- name: Generate root.key if it does not exist
+  command: openssl ecparam -name secp384r1 -genkey -out "{{ role_path }}/files/root.key"
+  when: not root_key_stat.stat.exists
+
+# root.pem
+- name: Check if root.pem exists
+  stat:
+    path: "{{ role_path }}/files/root.pem"
+  register: root_pem_stat
+
+- name: Generate root.pem if it does not exist
+  command: openssl req -new -key "{{ role_path }}/files/root.key" -x509 -nodes -days 1461 -out "{{ role_path }}/files/root.pem" -subj "/CN=vaultwarden.local" -addext "basicConstraints=critical,CA:TRUE,pathlen:0"
+  when: not root_pem_stat.stat.exists
