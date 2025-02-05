@@ -1,15 +1,14 @@
 - name: Uninstall old versions
   ansible.builtin.package:
-    name: "{{ item }}"
+    name:
+      - docker.io
+      - docker-doc
+      - docker-compose
+      - docker-compose-v2
+      - podman-docker
+      - containerd
+      - runc
     state: absent
-  loop:
-    - docker.io
-    - docker-doc
-    - docker-compose
-    - docker-compose-v2
-    - podman-docker
-    - containerd
-    - runc
   notify: Update APT cache
 
 - name: Add Docker's official GPG key
@@ -41,11 +40,10 @@
 
 - name: Install the Docker packages
   ansible.builtin.package:
-    name: "{{ item }}"
+    name:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+      - docker-buildx-plugin
+      - docker-compose-plugin
     state: latest
-  loop:
-    - docker-ce
-    - docker-ce-cli
-    - containerd.io
-    - docker-buildx-plugin
-    - docker-compose-plugin
