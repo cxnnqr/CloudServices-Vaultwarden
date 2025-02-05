@@ -70,7 +70,7 @@ Access Grafana at: `http://<deployment_floating_ip>:3000`
 
 After deployment, Terraform will output:
 - Frontend load balancer IP
-- Deployment instance floating IP
+- Deployment instance IP
 
 ## Security Groups
 
