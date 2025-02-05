@@ -88,7 +88,7 @@ module "loadbalancer" {
   subnet_id   = module.network.subnet_id
   # frontend variables
   frontend_instances     = module.compute.frontend_instances
-  frontend_protocol      = "HTTP"        #"TCP" ----> Set to TCP for production
-  frontend_protocol_port = 80            #443 ----> Set to 443 for production
-  frontend_lb_method     = "ROUND_ROBIN" #"SOURCE_IP" ----> Set to SOURCE_IP for production
+  frontend_protocol      = "TCP"       #"TCP" ----> Set to TCP for production
+  frontend_protocol_port = 443         #443 ----> Set to 443 for production
+  frontend_lb_method     = "SOURCE_IP" #"SOURCE_IP" ----> Set to SOURCE_IP for production
 }
