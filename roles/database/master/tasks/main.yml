@@ -1,0 +1,34 @@
+# Init Database
+- name: Check if Vaultwarden database exists
+  mysql_db:
+    name: vaultwarden
+    state: present
+    login_user: root
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+  register: db_check
+
+- name: Init Database if non-exitent
+  include_tasks: init.yml
+  when: db_check.failed
+
+- name: Configure mariadb
+  template:
+    src: mysql.cnf.j2
+    dest: /etc/mysql/conf.d/mysql.cnf
+
+#- name: Get Master Status
+#  mysql_query:
+#    login_user: root
+#    login_unix_socket: /var/run/mysqld/mysqld.sock
+#    query: "SHOW MASTER STATUS;"
+#  register: master_status
+
+#- name: Set Master Status
+#  set_fact:
+#    master_log_file: "{{ master_status.stdout[0]['File'] }}"
+#    master_log_pos: "{{ master_status.stdout[0]['Position'] }}"
+
+- name: Restart MariaDB
+  service:
+    name: mysql
+    state: restarted

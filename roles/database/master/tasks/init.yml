@@ -1,0 +1,45 @@
+- name: Create Vaultwarden database
+  mysql_db:
+    name: vaultwarden
+    encoding: utf8mb4
+    collation: utf8mb4_unicode_ci
+    state: present
+    login_user: root
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+
+- name: Create Vaultwarden user
+  mysql_user:
+    name: vaultwarden
+    password: "{{ MYSQL_PASSWORD }}"
+    host: '%'
+    state: present
+    login_user: root
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+
+- name: Grant privileges to Vaultwarden user
+  mysql_user:
+    name: vaultwarden
+    host: '%'
+    priv: "vaultwarden.*:ALL"
+    state: present
+    login_user: root
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+
+- name: Grant additional specific privileges to Vaultwarden user
+  mysql_user:
+    name: vaultwarden
+    host: '%'
+    priv: "vaultwarden.*:ALTER,CREATE,DELETE,DROP,INDEX,INSERT,REFERENCES,SELECT,UPDATE"
+    state: present
+    login_user: root
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+  
+- name: Create Replication User
+  mysql_user:
+    name: repl
+    password: "{{ MYSQL_REPL_PASSWORD }}"
+    priv: '*.*:REPLICATION SLAVE'
+    host: '%'
+    state: present
+    login_user: root
+    login_unix_socket: /var/run/mysqld/mysqld.sock

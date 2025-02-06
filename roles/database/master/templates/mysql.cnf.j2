@@ -1,0 +1,11 @@
+[mysqld]
+# Enable binary logging
+log-bin = /var/lib/mysql/mysql-bin
+server-id = 1               # Unique server ID (use a unique ID for each master/slave)
+binlog-format = ROW          # Ensures more accurate replication (ROW, STATEMENT, MIXED)
+expire-logs-days = 10        # Optional: Retain logs for a specific number of days before purging
+gtid-strict-mode = 1         # Optional: Strict mode for GTID-based replication
+log_slave_updates = 1        # Required if this master will also act as a slave
+
+# Optionally configure server to act as a master for replication
+bind-address = 0.0.0.0       # Optional: bind to all interfaces for remote access (careful with security)
