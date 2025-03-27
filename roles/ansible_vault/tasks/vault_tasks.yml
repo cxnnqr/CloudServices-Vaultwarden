@@ -3,6 +3,7 @@
     vault_secrets: |
       MYSQL_ROOT_PASSWORD: "{{ lookup('password', '/dev/null length=64') }}"
       MYSQL_PASSWORD: "{{ lookup('password', '/dev/null length=64') }}"
+      MYSQL_REPL_PASSWORD: "{{ lookup('password', '/dev/null length=64') }}"
       ADMIN_TOKEN: "{{ lookup('password', '/dev/null length=64') }}"
   no_log: true  # Hide passwords in logs
 

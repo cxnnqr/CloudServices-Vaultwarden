@@ -6,14 +6,6 @@
     group: root
     mode: "0755"
 
-- name: Copy ProxySQL Config
-  ansible.builtin.template:
-    src: templates/proxysql.cnf.j2
-    dest: "{{ vaultwarden_project_dir }}/proxysql.cnf"
-    owner: root
-    group: root
-    mode: "0644"
-
 - name: Install Docker compose config
   ansible.builtin.template:
     src: docker-compose.yml.j2

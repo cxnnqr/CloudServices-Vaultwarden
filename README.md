@@ -89,7 +89,7 @@ The configuration includes security groups with rules for:
 - `network/`: Network and subnet setup
 - `security/`: Security group definitions
 
-## Licenses
+## Technology used
 
 This project uses several open-source components that are licensed under different terms:
 
@@ -108,6 +108,11 @@ This project uses several open-source components that are licensed under differe
 
 - **Ansible** - GNU General Public License v3.0 (GPL-3.0)
 - **Docker** (via Ansible collection) - Apache License 2.0
+
+#### ansible-galaxy collection
+
+- **community.docker**: `ansible-galaxy collection install community.docker`
+- **community.mysql**: `ansible-galaxy collection install community.mysql`
 
 ### Operating System and Packages
 
