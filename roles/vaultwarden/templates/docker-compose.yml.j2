@@ -12,14 +12,63 @@ networks:
 services:
   vault:
     environment:
+      ####################
+      ### Data folders ###
+      ####################
+      RSA_KEY_FILENAME: "{{ VAULTWARDEN_ENV_RSA_KEY_FILENAME }}"
+      ICON_CACHE_FOLDER: "{{ VAULTWARDEN_ENV_ICON_CACHE_FOLDER }}"
+      ATTACHMENTS_FOLDER: "{{ VAULTWARDEN_ENV_ATTACHMENTS_FOLDER }}"
+      SENDS_FOLDER: "{{ VAULTWARDEN_ENV_SENDS_FOLDER }}"
+      TMP_FOLDER: "{{ VAULTWARDEN_ENV_TMP_FOLDER }}"
+
+      TEMPLATES_FOLDER: "{{ VAULTWARDEN_ENV_TEMPLATES_FOLDER }}"
+      RELOAD_TEMPLATES: {{ VAULTWARDEN_ENV_RELOAD_TEMPLATES }}
+
+      #########################
+      ### Database settings ###
+      #########################
+      DATABASE_URL: "{{ VAULTWARDEN_ENV_DATABASE_URL }}"
+      ENABLE_DB_WAL: {{ VAULTWARDEN_ENV_ENABLE_DB_WAL }}
+      DB_CONNECTION_RETRIES: {{ VAULTWARDEN_ENV_DB_CONNECTION_RETRIES }}
+      DATABASE_TIMEOUT: {{ VAULTWARDEN_ENV_DATABASE_TIMEOUT }}
+      DATABASE_MAX_CONNS: {{ VAULTWARDEN_ENV_DATABASE_MAX_CONNS }}
+
+      #################
+      ### WebSocket ###
+      #################
+      ENABLE_WEBSOCKET: {{ VAULTWARDEN_ENV_ENABLE_WEBSOCKET }}
+
+      ##########################
+      ### Push notifications ###
+      ##########################
+      {% if VAULTWARDEN_ENV_PUSH_INSTALLATION_ID and VAULTWARDEN_ENV_PUSH_INSTALLATION_KEY %}
+      PUSH_ENABLED: true
+      PUSH_INSTALLATION_ID: "{{ VAULTWARDEN_ENV_PUSH_INSTALLATION_ID }}"
+      PUSH_INSTALLATION_KEY: "{{ VAULTWARDEN_ENV_PUSH_INSTALLATION_KEY }}"
+      {% endif %}
+
+      ########################
+      ### General settings ###
+      ########################
+
+      {% if VAULTWARDEN_ENV_HIBP_API_KEY %}
+      HIBP_API_KEY: {{ VAULTWARDEN_ENV_HIBP_API_KEY }}
+      {% endif %}
+
+      #########################
+      ### Advanced settings ###
+      #########################
+      IP_HEADER: "{{ VAULTWARDEN_ENV_IP_HEADER }}"
+
       ADMIN_TOKEN: '{{ ADMIN_TOKEN }}'
-      RUST_BACKTRACE: 1
+      RUST_BACKTRACE: {{ VAULTWARDEN_ENV_RUST_BACKTRACE }}
+      SHOW_PASSWORD_HINT: {{ VAULTWARDEN_ENV_SHOW_PASSWORD_HINT }}
     image: 'vaultwarden/server:latest'
     restart: 'unless-stopped'
     ports:
       - "80:80"
     volumes:
-      - 'vault:/data'
+      - "vault:/data/"
 
 volumes:
   vault:
