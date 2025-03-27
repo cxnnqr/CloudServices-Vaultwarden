@@ -1,19 +1,10 @@
-- name: Setup Ansible Vault
-  gather_facts: no
-  hosts: localhost
-  roles:
-    - name: ansible_vault
-      become: no
-    - name: certificate
-      become: no
-
 - name: Install Essential software
   hosts: all
   roles:
     - name: essentials
       become: yes
 
-- name: Install Vaultwarden backend in Failover config
+- name: Install Vaultwarden backend
   hosts: vault
   roles:
     - name: docker
@@ -27,4 +18,14 @@
     - name: nginx
       become: yes
 
-#- name: Install Database
+- name: Init Database install
+  hosts: database
+  roles:
+    - name: database
+      become: yes
+
+- name: Install Database Master
+  hosts: database_master
+  roles:
+    - name: database/master
+      become: yes

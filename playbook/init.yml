@@ -1,0 +1,8 @@
+- name: Setup Ansible Vault
+  gather_facts: no
+  hosts: localhost
+  roles:
+    - name: ansible_vault
+      become: no
+    - name: certificate
+      become: no
