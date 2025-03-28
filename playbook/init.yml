@@ -6,3 +6,11 @@
       become: no
     - name: certificate
       become: no
+  tasks:
+    - name: Install community.docker
+      ansible.builtin.command:
+        cmd: ansible-galaxy collection install community.docker
+
+    - name: Install community.mysql
+      ansible.builtin.command:
+        cmd: ansible-galaxy collection install community.mysql
