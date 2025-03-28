@@ -20,4 +20,9 @@
     mode: '0600'
 
 - name: Encrypt secrets.yml with Ansible Vault
-  command: ansible-vault encrypt ./group_vars/all/secrets.yml
+  command: ansible-vault encrypt ./group_vars/all/secrets.yml --vault-password-file=/tmp/.vault_pass
+
+- name: Remove temporary Vault password file
+  file:
+    path: "/tmp/.vault_pass"
+    state: absent
