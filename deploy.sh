@@ -9,6 +9,7 @@ cd "$REPO" || exit 1
 sudo cp /etc/ansible/hosts inventory
 
 # Exec playbook-init
+sudo chown -R 1000:1000 CloudServices-Vaultwarden
 if [ ! -f "$REPO/group_vars/all/secrets.yml" ]; then
     ansible-playbook playbook-init.yml
 fi
