@@ -7,6 +7,7 @@ This project contains Terraform configurations to deploy a highly available Vaul
 The infrastructure consists of:
 - Multiple frontend instances behind a load balancer
 - Two backend instances, one is for failover
+- A database instance for data persistence
 - A deployment instance with Prometheus and Grafana for monitoring
 - Network configuration with security groups
 - Automated instance configuration using cloud-init scripts
@@ -18,7 +19,42 @@ The infrastructure consists of:
 - SSH key pair for instance access
 - OpenStack CA certificate
 
-## Quick Start
+### OpenStack CLI Configuration
+
+Before starting, you need to configure your OpenStack CLI:
+
+1. Download your `clouds.yaml` file from the OpenStack dashboard:
+   - Navigate to: https://private-cloud.informatik.hs-fulda.de/horizon/project/api_access/
+
+2. Add your password to the file under the "auth" section:
+   ```bash
+   nano clouds.yaml
+   ```
+   
+   Example:
+   ```yaml
+   clouds:
+     openstack:
+       auth:
+         auth_url: example
+         username: example
+         password: "ADD PASSWORD HERE"  # Add your password here
+         project_id: example
+         project_name: "example"
+         user_domain_name: "example"
+       region_name: "example"
+       interface: "example"
+       identity_api_version: example
+   ```
+
+3. Move this file to the OpenStack configuration directory:
+   ```bash
+   mv clouds.yaml ~/.config/openstack/clouds.yaml
+   ```
+
+## Deployment Process
+
+### Infrastructure Setup
 
 1. Clone this repository
     ```bash
@@ -34,13 +70,16 @@ The infrastructure consists of:
 3. Edit `terraform.tfvars` with your specific values:
    ```hcl
    public_key              = "~/.ssh/your_key.pub"
-   group_name             = "your-group-name"
-   router_name            = "your-router-name"
-   global_image_name      = "ubuntu-22.04-jammy-server-cloud-image-amd64" #default
+   group_name              = "your-group-name"
+   router_name             = "your-router-name"
+   global_image_name       = "ubuntu-22.04-jammy-server-cloud-image-amd64" #default
    backend_instance_count  = 2 #default
+   database_instance_count = 1 #default
    frontend_instance_count = 3 #default
-   pubnet_name            = "ext_net" #default
-   dns_nameservers        = ["8.8.8.8"] #default
+   pubnet_name             = "ext_net" #default
+   dns_nameservers         = ["8.8.8.8"] #default
+   ANSIBLE_VAULT_PASSWORD  = "your-vault-password"
+   ANSIBLE_BECOME_PASSWORD = "your-sudo-password"
    ```
 
 4. Initialize Terraform:
@@ -55,6 +94,29 @@ The infrastructure consists of:
    terraform apply "tf.plan"
    ```
 
+   After completion, Terraform will output:
+   - `frontend_vip_addr`: The IP address where you can access Vaultwarden later
+   - `deployment_floating_ip`: The IP address of the deployment instance from where Vaultwarden will be installed
+
+### Application Deployment
+
+6. Connect to the deployment instance via SSH:
+   ```bash
+   ssh ubuntu@<deployment_floating_ip> -i <PATH_TO_YOUR_PRIVATE_KEY>
+   cd CloudServices-Vaultwarden
+   ```
+
+7. Run the deployment script:
+   ```bash
+   ./deploy.sh
+   ```
+   
+   You will be prompted to:
+   - Set a vault password
+   - Enter the become (sudo) password
+
+8. Access Vaultwarden by navigating to the `frontend_vip_addr` in your web browser
+
 ## Monitoring
 
 The deployment instance includes:
@@ -65,12 +127,6 @@ The deployment instance includes:
 
 Access Grafana at: `http://<deployment_floating_ip>:3000`
 - Default credentials: admin/admin
-
-## Outputs
-
-After deployment, Terraform will output:
-- Frontend load balancer IP
-- Deployment instance IP
 
 ## Security Groups
 
