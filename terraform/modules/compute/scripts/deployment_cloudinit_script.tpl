@@ -58,6 +58,7 @@ cd "$HOME" || exit 1
 #Pull git repo from remote
 if [ ! -d "CloudServices-Vaultwarden" ]; then
     git clone https://github.com/cxnnqr/CloudServices-Vaultwarden.git
+    sudo chown -R 1000:1000 CloudServices-Vaultwarden
 fi
 
 ########################################################################
