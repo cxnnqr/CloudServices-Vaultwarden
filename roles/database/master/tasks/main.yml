@@ -7,7 +7,7 @@
     login_unix_socket: /var/run/mysqld/mysqld.sock
   register: db_check
 
-- name: Init Dataebase if non-exitnt
+- name: Init Database if non-exitnt
   include_tasks: init.yml
   when: db_check.failed
 
