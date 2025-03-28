@@ -29,7 +29,14 @@
   mysql_user:
     name: vaultwarden
     host: '%'
-    priv: "vaultwarden.*:ALTER,CREATE,DELETE,DROP,INDEX,INSERT,REFERENCES,SELECT,UPDATE, BINLOG MONITOR"
+    priv: "vaultwarden.*:ALTER,CREATE,DELETE,DROP,INDEX,INSERT,REFERENCES,SELECT,UPDATE"
     state: present
     login_user: root
     login_unix_socket: /var/run/mysqld/mysqld.sock
+
+- name: Comment out the bind-address directive in 50-server.cnf
+  ansible.builtin.lineinfile:
+    path: /etc/mysql/mariadb.conf.d/50-server.cnf  # Path to the config file
+    regexp: '^bind-address'  # Regular expression to match the line starting with "bind-address"
+    line: '#bind-address'  # Comment the line by adding a # at the beginning
+    backup: yes  # Create a backup of the file before modifying it

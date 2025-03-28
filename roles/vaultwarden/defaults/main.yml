@@ -40,7 +40,7 @@ VAULTWARDEN_ENV_RELOAD_TEMPLATES: false
 ## - https://www.postgresql.org/docs/current/libpq-connect.html#LIBPQ-CONNSTRING
 # DATABASE_URL=postgresql://user:password@host[:port]/database_name
 
-VAULTWARDEN_ENV_DATABASE_URL: "mysql://vaultwarden:{{ MYSQL_PASSWORD }}@{{ groups['database_master'] }}:3306/vaultwarden"
+VAULTWARDEN_ENV_DATABASE_URL: "mysql://vaultwarden:{{ MYSQL_PASSWORD }}@{{ groups['database_master'][0] }}:3306/vaultwarden"
 
 ## Enable WAL for the DB
 ## Set to false to avoid enabling WAL during startup.
