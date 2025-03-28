@@ -6,7 +6,7 @@ REPO=$HOME/CloudServices-Vaultwarden
 cd "$REPO" || exit 1
 
 # Copy inventory file
-cp /etc/ansible/hosts inventory
+sudo cp /etc/ansible/hosts inventory
 
 # Exec playbook-init
 if [ ! -f "$REPO/group_vars/all/secrets.yml" ]; then
