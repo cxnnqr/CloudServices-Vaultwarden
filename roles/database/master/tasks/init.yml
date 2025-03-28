@@ -33,13 +33,3 @@
     state: present
     login_user: root
     login_unix_socket: /var/run/mysqld/mysqld.sock
-  
-- name: Create Replication User
-  mysql_user:
-    name: repl
-    password: "{{ MYSQL_REPL_PASSWORD }}"
-    priv: '*.*:REPLICATION SLAVE'
-    host: '%'
-    state: present
-    login_user: root
-    login_unix_socket: /var/run/mysqld/mysqld.sock
