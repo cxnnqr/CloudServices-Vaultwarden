@@ -4,9 +4,8 @@ export HOME="/home/ubuntu"
 
 # Update and install required packages
 sudo apt update && sudo apt upgrade -y
-sudo apt install -y python3 git pipx
+sudo apt install -y python3 git pipx python3-pymysql
 sudo -u ubuntu pipx install --include-deps ansible
-sudo -u ubuntu ansible-galaxy collection install community.docker
 
 
 
@@ -42,8 +41,24 @@ ${ip}
 %{ for ip in frontend_private_ip_list }
 ${ip}
 %{ endfor }
+
+[database_master]
+%{ for ip in database_private_ip_list }
+${ip}
+%{ endfor }
+
+[database:children]
+database_master
 EOF
 
+
+#Ensure shell is in HOME Dir
+cd "$HOME" || exit 1
+
+#Pull git repo from remote
+if [ ! -d "CloudServices-Vaultwarden" ]; then
+    git clone https://github.com/cxnnqr/CloudServices-Vaultwarden.git
+fi
 
 ########################################################################
 # Install Prometheus Server
@@ -327,12 +342,5 @@ sudo apt install -y jq
 curl -s https://grafana.com/api/dashboards/1860/revisions/latest/download -o /tmp/dashboard-1860.json
 jq '{ "dashboard": ., "overwrite": true, "folderId": 0, "inputs": [{ "name": "DS_PROMETHEUS", "type": "datasource", "pluginId": "prometheus", "value": "Prometheus" }] }' /tmp/dashboard-1860.json > /tmp/dashboard-1860-modified.json
 curl -X POST -H "Content-Type: application/json" -d @/tmp/dashboard-1860-modified.json http://admin:admin@localhost:3000/api/dashboards/import
-
-cd $HOME || exit 1
-sudo -u ubuntu git clone https://github.com/cxnnqr/CloudServices-Vaultwarden.git
-cd CloudServices-Vaultwarden || exit 1
-sudo -u ubuntu cp /etc/ansible/hosts inventory
-sudo -u ubuntu ansible-galaxy collection install community.docker
-
-
 echo "Prometheus and Grafana installation completed successfully!"
+
