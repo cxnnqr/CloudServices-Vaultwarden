@@ -29,7 +29,7 @@
   mysql_user:
     name: vaultwarden
     host: '%'
-    priv: "vaultwarden.*:ALTER,CREATE,DELETE,DROP,INDEX,INSERT,REFERENCES,SELECT,UPDATE, BINLOG MONITOR"
+    priv: "vaultwarden.*:ALTER,CREATE,DELETE,DROP,INDEX,INSERT,REFERENCES,SELECT,UPDATE"
     state: present
     login_user: root
     login_unix_socket: /var/run/mysqld/mysqld.sock
