@@ -84,11 +84,12 @@ resource "openstack_networking_secgroup_rule_v2" "terraform-secgroup-database" {
   port_range_max    = 3306
 }
 
-resource "openstack_networking_secgroup_rule_v2" "terraform-secgroup-ICMP" {
-  security_group_id = openstack_networking_secgroup_v2.terraform-secgroup.id
-  direction         = "ingress"
-  ethertype         = "IPv4"
-  protocol          = "icmp"
-  port_range_min    = 0
-  port_range_max    = 0
-}
+# For debugging purposes
+# resource "openstack_networking_secgroup_rule_v2" "terraform-secgroup-ICMP" {
+#   security_group_id = openstack_networking_secgroup_v2.terraform-secgroup.id
+#   direction         = "ingress"
+#   ethertype         = "IPv4"
+#   protocol          = "icmp"
+#   port_range_min    = 0
+#   port_range_max    = 0
+# }
