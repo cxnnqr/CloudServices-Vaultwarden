@@ -42,10 +42,10 @@ variable "backend_instance_count" {
   default     = 2
 }
 
-variable "database_instance_count" {
+variable "slave_database_instance_count" {
   type        = number
-  description = "Number of backend instances to create. Only failover so 2 is enough"
-  default     = 1
+  description = "Number of slave database instances to create."
+  default     = 2
 }
 
 variable "frontend_instance_count" {
