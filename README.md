@@ -115,7 +115,12 @@ Before starting, you need to configure your OpenStack CLI:
    - Set a vault password
    - Enter the become (sudo) password
 
-8. Access Vaultwarden by navigating to the `frontend_vip_addr` in your web browser
+8. Access Vaultwarden by navigating to the `frontend_vip_addr` in your web browser:
+   ```
+   https://<frontend_vip_addr>
+   ```
+   
+   **Note**: You must use HTTPS protocol when accessing Vaultwarden through the load balancer. Your browser may show a certificate warning because the SSL certificate is self-signed. You'll need to accept the warning to proceed.
 
 ## Monitoring
 
@@ -130,12 +135,17 @@ Access Grafana at: `http://<deployment_floating_ip>:3000`
 
 ## Security Groups
 
-The configuration includes security groups with rules for:
-- HTTP (80)
-- SSH (22)
-- Prometheus (9090)
-- Node Exporter (9100)
-- Grafana (3000)
+The configuration includes security groups with rules for the following ports:
+- HTTP (80) - Web traffic
+- HTTPS (443) - Secure web traffic for Vaultwarden access
+- SSH (22) - Remote administration
+- MariaDB (3306) - Database connections
+- Prometheus (9090) - Metrics collection
+- Node Exporter (9100) - System metrics
+- Grafana (3000) - Monitoring dashboard
+- Loki (3100) - Log aggregation
+
+All security group rules are configured for ingress traffic with IPv4 ethertype.
 
 ## Module Structure
 
