@@ -7,5 +7,3 @@ slave_database_instance_count = 2
 frontend_instance_count = 3
 pubnet_name             = "ext_net"
 dns_nameservers         = ["8.8.8.8"]
-ANSIBLE_VAULT_PASSWORD  = <SET_THE_VAULT_PASSWORD>
-ANSIBLE_BECOME_PASSWORD = <SUDO_PASSWORD>

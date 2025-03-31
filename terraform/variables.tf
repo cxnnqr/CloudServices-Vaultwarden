@@ -53,10 +53,3 @@ variable "frontend_instance_count" {
   description = "Number of frontend instances to create. High availability so odd numbers recommended"
   default     = 3
 }
-
-variable "ANSIBLE_VAULT_PASSWORD" {
-  type = string
-}
-variable "ANSIBLE_BECOME_PASSWORD" {
-  type = string
-}

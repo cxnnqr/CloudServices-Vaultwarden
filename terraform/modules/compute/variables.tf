@@ -70,14 +70,6 @@ variable "frontend_private_ip_list" {
   type        = list(string)
 }
 
-variable "ANSIBLE_VAULT_PASSWORD" {
-  type = string
-}
-
-variable "ANSIBLE_BECOME_PASSWORD" {
-  type = string
-}
-
 ###########################################################################
 #
 # backend

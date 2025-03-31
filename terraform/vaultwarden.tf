@@ -78,9 +78,6 @@ module "compute" {
   master_database_private_ip = module.compute.master_database_private_ip
   database_private_ip_list   = module.compute.database_private_ip_list
   frontend_private_ip_list   = module.compute.frontend_private_ip_list
-  # ansible variables
-  ANSIBLE_VAULT_PASSWORD  = var.ANSIBLE_VAULT_PASSWORD
-  ANSIBLE_BECOME_PASSWORD = var.ANSIBLE_BECOME_PASSWORD
 
   depends_on = [module.network]
 }

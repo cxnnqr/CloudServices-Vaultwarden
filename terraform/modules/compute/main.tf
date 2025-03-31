@@ -123,8 +123,6 @@ resource "openstack_compute_instance_v2" "vaultwarden-deployment-instance" {
     master_database_private_ip = var.master_database_private_ip
     database_private_ip_list   = var.database_private_ip_list
     frontend_private_ip_list   = var.frontend_private_ip_list
-    ANSIBLE_VAULT_PASSWORD     = var.ANSIBLE_VAULT_PASSWORD
-    ANSIBLE_BECOME_PASSWORD    = var.ANSIBLE_BECOME_PASSWORD
     access_network             = true
   })
 }
