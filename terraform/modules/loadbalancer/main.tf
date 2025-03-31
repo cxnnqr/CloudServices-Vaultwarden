@@ -47,16 +47,18 @@ resource "openstack_lb_members_v2" "members-frontend" {
 
 resource "openstack_lb_monitor_v2" "monitor-frontend" {
   pool_id        = openstack_lb_pool_v2.pool-frontend.id
-  type           = "HTTP"
+  type           = "HTTPS"
   delay          = 5
   timeout        = 5
   max_retries    = 3
   http_method    = "GET"
   url_path       = "/"
-  expected_codes = 200
+  expected_codes = 200 # maybe 302 or 301
 }
 
 resource "openstack_networking_floatingip_v2" "fip-frontend" {
   pool    = var.pubnet_name
   port_id = openstack_lb_loadbalancer_v2.lb-frontend.vip_port_id
 }
+
+

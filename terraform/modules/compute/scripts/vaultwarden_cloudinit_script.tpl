@@ -2,7 +2,7 @@
 
 # Update package lists and install necessary packages
 apt-get update
-apt-get -y install python3
+apt-get -y install python3 python3-pymysql
 
 # Add public key of deployment instance to authorized_keys
 export HOME="/home/ubuntu"
@@ -57,3 +57,4 @@ sudo systemctl enable node_exporter
 sudo systemctl start node_exporter
 
 echo "Node Exporter setup completed successfully!"
+echo "test"

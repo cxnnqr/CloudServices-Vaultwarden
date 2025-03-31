@@ -25,7 +25,30 @@ resource "openstack_compute_instance_v2" "vaultwarden-backend-instances" {
   network {
     uuid = var.network_id
   }
-  user_data = templatefile("${path.module}/scripts/dummyLoadBalancer.tpl", {
+  user_data = templatefile("${path.module}/scripts/vaultwarden_cloudinit_script.tpl", {
+    instance_number = count.index + 1
+    public_key      = var.deployment_public_key
+  })
+}
+
+###########################################################################
+#
+# database instances
+#
+###########################################################################
+resource "openstack_compute_instance_v2" "vaultwarden-database-instances" {
+  count           = var.database_instance_count
+  name            = "vaultwarden-database-instance-${count.index + 1}"
+  image_name      = var.database_image_name
+  flavor_name     = var.database_flavor_name
+  key_pair        = var.terraform_keypair_name
+  security_groups = [var.secgroup_name]
+
+
+  network {
+    uuid = var.network_id
+  }
+  user_data = templatefile("${path.module}/scripts/vaultwarden_cloudinit_script.tpl", {
     instance_number = count.index + 1
     public_key      = var.deployment_public_key
   })
@@ -49,7 +72,7 @@ resource "openstack_compute_instance_v2" "vaultwarden-frontend-instances" {
   network {
     uuid = var.network_id
   }
-  user_data = templatefile("${path.module}/scripts/dummyLoadBalancer.tpl", {
+  user_data = templatefile("${path.module}/scripts/vaultwarden_cloudinit_script.tpl", {
     instance_number = count.index + 1
     public_key      = var.deployment_public_key
   })
@@ -75,7 +98,10 @@ resource "openstack_compute_instance_v2" "vaultwarden-deployment-instance" {
     public_key               = var.deployment_public_key
     private_key              = var.deployment_private_key
     backend_private_ip_list  = var.backend_private_ip_list
+    database_private_ip_list = var.database_private_ip_list
     frontend_private_ip_list = var.frontend_private_ip_list
+    ANSIBLE_VAULT_PASSWORD   = var.ANSIBLE_VAULT_PASSWORD
+    ANSIBLE_BECOME_PASSWORD  = var.ANSIBLE_BECOME_PASSWORD
     access_network           = true
   })
 }

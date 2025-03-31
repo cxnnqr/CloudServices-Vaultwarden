@@ -62,6 +62,10 @@ module "compute" {
   backend_instance_count = var.backend_instance_count
   backend_image_name     = var.global_image_name
   backend_flavor_name    = "m1.small"
+  #database instances
+  database_instance_count = var.database_instance_count
+  database_image_name     = var.global_image_name
+  database_flavor_name    = "m1.small"
   # frontend variables
   frontend_instance_count = var.frontend_instance_count
   frontend_image_name     = var.global_image_name
@@ -71,14 +75,18 @@ module "compute" {
   deployment_flavor_name   = "m1.medium"
   deployment_private_key   = module.keypairs.deployment_private_key
   backend_private_ip_list  = module.compute.backend_private_ip_list
+  database_private_ip_list = module.compute.database_private_ip_list
   frontend_private_ip_list = module.compute.frontend_private_ip_list
+  # ansible variables
+  ANSIBLE_VAULT_PASSWORD  = var.ANSIBLE_VAULT_PASSWORD
+  ANSIBLE_BECOME_PASSWORD = var.ANSIBLE_BECOME_PASSWORD
 
   depends_on = [module.network]
 }
 
 ###########################################################################
 #
-# create load balancers (backend and frontend)
+# create load balancers (frontend)
 #
 ###########################################################################
 module "loadbalancer" {
@@ -89,6 +97,6 @@ module "loadbalancer" {
   # frontend variables
   frontend_instances     = module.compute.frontend_instances
   frontend_protocol      = "TCP"       #"TCP" ----> Set to TCP for production
-  frontend_protocol_port = 443         #443 ----> Set to 443 for production
+  frontend_protocol_port = 80          #443 ----> Set to 443 for production
   frontend_lb_method     = "SOURCE_IP" #"SOURCE_IP" ----> Set to SOURCE_IP for production
 }

@@ -42,8 +42,21 @@ variable "backend_instance_count" {
   default     = 2
 }
 
+variable "database_instance_count" {
+  type        = number
+  description = "Number of backend instances to create. Only failover so 2 is enough"
+  default     = 1
+}
+
 variable "frontend_instance_count" {
   type        = number
   description = "Number of frontend instances to create. High availability so odd numbers recommended"
   default     = 3
+}
+
+variable "ANSIBLE_VAULT_PASSWORD" {
+  type = string
+}
+variable "ANSIBLE_BECOME_PASSWORD" {
+  type = string
 }

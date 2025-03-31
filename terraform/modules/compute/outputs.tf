@@ -22,6 +22,17 @@ output "backend_private_ip_list" {
   value       = openstack_compute_instance_v2.vaultwarden-backend-instances[*].network[0].fixed_ip_v4
 }
 
+
+###########################################################################
+#
+# database outputs
+#
+###########################################################################
+output "database_private_ip_list" {
+  description = "private IPs of the database instances"
+  value       = openstack_compute_instance_v2.vaultwarden-database-instances[*].network[0].fixed_ip_v4
+}
+
 ###########################################################################
 #
 # frontend outputs

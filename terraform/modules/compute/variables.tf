@@ -55,9 +55,22 @@ variable "backend_private_ip_list" {
   type        = list(string)
 }
 
+variable "database_private_ip_list" {
+  description = "List of private IPs for database instances"
+  type        = list(string)
+}
+
 variable "frontend_private_ip_list" {
   description = "List of private IPs for frontend instances"
   type        = list(string)
+}
+
+variable "ANSIBLE_VAULT_PASSWORD" {
+  type = string
+}
+
+variable "ANSIBLE_BECOME_PASSWORD" {
+  type = string
 }
 
 ###########################################################################
@@ -78,6 +91,29 @@ variable "backend_image_name" {
 }
 
 variable "backend_flavor_name" {
+  description = "Name of the flavor/instance type to use. OPTIONS: m1.small, m1.medium, m1.large"
+  type        = string
+  default     = "m1.small"
+}
+
+###########################################################################
+#
+# database
+#
+###########################################################################
+variable "database_instance_count" {
+  description = "Number of backend instances to create"
+  type        = number
+  default     = 2
+}
+
+variable "database_image_name" {
+  description = "Name of the image to use for the instances"
+  type        = string
+  default     = "ubuntu-22.04-jammy-server-cloud-image-amd64"
+}
+
+variable "database_flavor_name" {
   description = "Name of the flavor/instance type to use. OPTIONS: m1.small, m1.medium, m1.large"
   type        = string
   default     = "m1.small"
@@ -106,3 +142,5 @@ variable "frontend_flavor_name" {
   type        = string
   default     = "m1.small"
 }
+
+
