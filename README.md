@@ -74,7 +74,7 @@ Before starting, you need to configure your OpenStack CLI:
    router_name             = "your-router-name"
    global_image_name       = "ubuntu-22.04-jammy-server-cloud-image-amd64" #default
    backend_instance_count  = 2 #default
-   database_instance_count = 1 #default
+   slave_database_instance_count = 2 #default
    frontend_instance_count = 3 #default
    pubnet_name             = "ext_net" #default
    dns_nameservers         = ["8.8.8.8"] #default
