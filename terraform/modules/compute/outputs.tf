@@ -28,6 +28,12 @@ output "backend_private_ip_list" {
 # database outputs
 #
 ###########################################################################
+
+output "master_database_private_ip" {
+  description = "private IP of the master database instance"
+  value       = openstack_compute_instance_v2.vaultwarden-master-database-instance[0].network[0].fixed_ip_v4
+}
+
 output "database_private_ip_list" {
   description = "private IPs of the database instances"
   value       = openstack_compute_instance_v2.vaultwarden-database-instances[*].network[0].fixed_ip_v4

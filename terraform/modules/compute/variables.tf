@@ -55,6 +55,11 @@ variable "backend_private_ip_list" {
   type        = list(string)
 }
 
+variable "master_database_private_ip" {
+  description = "Private IP for master database instance"
+  type        = string
+}
+
 variable "database_private_ip_list" {
   description = "List of private IPs for database instances"
   type        = list(string)
@@ -101,8 +106,8 @@ variable "backend_flavor_name" {
 # database
 #
 ###########################################################################
-variable "database_instance_count" {
-  description = "Number of backend instances to create"
+variable "slave_database_instance_count" {
+  description = "Number of slave database instances to create"
   type        = number
   default     = 2
 }
