@@ -63,20 +63,21 @@ module "compute" {
   backend_image_name     = var.global_image_name
   backend_flavor_name    = "m1.small"
   #database instances
-  database_instance_count = var.database_instance_count
-  database_image_name     = var.global_image_name
-  database_flavor_name    = "m1.small"
+  slave_database_instance_count = var.slave_database_instance_count
+  database_image_name           = var.global_image_name
+  database_flavor_name          = "m1.small"
   # frontend variables
   frontend_instance_count = var.frontend_instance_count
   frontend_image_name     = var.global_image_name
   frontend_flavor_name    = "m1.small"
   # deployment variables
-  deployment_image_name    = var.global_image_name
-  deployment_flavor_name   = "m1.medium"
-  deployment_private_key   = module.keypairs.deployment_private_key
-  backend_private_ip_list  = module.compute.backend_private_ip_list
-  database_private_ip_list = module.compute.database_private_ip_list
-  frontend_private_ip_list = module.compute.frontend_private_ip_list
+  deployment_image_name      = var.global_image_name
+  deployment_flavor_name     = "m1.medium"
+  deployment_private_key     = module.keypairs.deployment_private_key
+  backend_private_ip_list    = module.compute.backend_private_ip_list
+  master_database_private_ip = module.compute.master_database_private_ip
+  database_private_ip_list   = module.compute.database_private_ip_list
+  frontend_private_ip_list   = module.compute.frontend_private_ip_list
   # ansible variables
   ANSIBLE_VAULT_PASSWORD  = var.ANSIBLE_VAULT_PASSWORD
   ANSIBLE_BECOME_PASSWORD = var.ANSIBLE_BECOME_PASSWORD
@@ -97,6 +98,6 @@ module "loadbalancer" {
   # frontend variables
   frontend_instances     = module.compute.frontend_instances
   frontend_protocol      = "TCP"       #"TCP" ----> Set to TCP for production
-  frontend_protocol_port = 80          #443 ----> Set to 443 for production
+  frontend_protocol_port = 443         #443 ----> Set to 443 for production
   frontend_lb_method     = "SOURCE_IP" #"SOURCE_IP" ----> Set to SOURCE_IP for production
 }
