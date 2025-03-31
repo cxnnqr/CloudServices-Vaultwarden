@@ -53,7 +53,8 @@ resource "openstack_lb_monitor_v2" "monitor-frontend" {
   max_retries    = 3
   http_method    = "GET"
   url_path       = "/"
-  expected_codes = 200 # maybe 302 or 301
+  expected_codes = "200,301"
+  admin_state_up = true
 }
 
 resource "openstack_networking_floatingip_v2" "fip-frontend" {
