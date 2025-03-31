@@ -43,6 +43,9 @@ ${ip}
 %{ endfor }
 
 [database_master]
+${master_database_private_ip}
+
+[database]
 %{ for ip in database_private_ip_list }
 ${ip}
 %{ endfor }
