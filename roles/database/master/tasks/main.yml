@@ -7,9 +7,9 @@
     login_unix_socket: /var/run/mysqld/mysqld.sock
   register: db_check
 
-- name: Init Database if non-exitnt
+- name: Init Database if non-exist
   include_tasks: init.yml
-  when: db_check.failed
+  #when: db_check.failed
 
 - name: Configure mariadb
   template:
